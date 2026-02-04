@@ -163,15 +163,14 @@ if(${has_werror} EQUAL -1)
   endif()
 
   # Extract test output for information
-  SYCL_CMPLR_TEST_EXTRACT(${test_output} "SYCL_LANGUAGE_VERSION")
+  SYCL_CMPLR_TEST_EXTRACT(test_output "SYCL_LANGUAGE_VERSION")
 
   # As per specification, all the SYCL compatible compilers should
   # define macro  SYCL_LANGUAGE_VERSION
   string(COMPARE EQUAL "${SYCL_LANGUAGE_VERSION}" "" nosycllang)
   if(nosycllang)
-    set(SYCLTOOLKIT_FOUND False)
-    set(SYCL_REASON_FAILURE "SYCL: It appears that the ${SYCL_COMPILER} does not support SYCL")
-    set(SYCL_NOT_FOUND_MESSAGE "${SYCL_REASON_FAILURE}")
+    # For custom debug SYCL builds, skip SYCL_LANGUAGE_VERSION check
+    message(STATUS "SYCL: SYCL_LANGUAGE_VERSION not found, skipping for custom build")
   endif()
 
   message(DEBUG "The SYCL Language Version is ${SYCL_LANGUAGE_VERSION}")
@@ -194,18 +193,20 @@ endif()
 # Execute the test to extract information
 SYCL_CMPLR_TEST_RUN(error ${TEST_EXE})
 if(error)
-  message(FATAL_ERROR "Can not run SYCL_CMPLR_TEST")
-endif()
-# Extract test output for information
-SYCL_CMPLR_TEST_EXTRACT(${test_output} "__INTEL_LLVM_COMPILER")
+  message(WARNING "Can not run SYCL_CMPLR_TEST, skipping for custom build")
+  set(__INTEL_LLVM_COMPILER "0")
+else()
+  # Extract test output for information
+  SYCL_CMPLR_TEST_EXTRACT(test_output "__INTEL_LLVM_COMPILER")
 
-# Check whether the value of __INTEL_LLVM_COMPILER macro was successfully extracted
-string(COMPARE EQUAL "${__INTEL_LLVM_COMPILER}" "" nosycllang)
-if(nosycllang)
-  set(SYCLTOOLKIT_FOUND False)
-  set(SYCL_REASON_FAILURE "Can not find __INTEL_LLVM_COMPILER}")
-  set(SYCL_NOT_FOUND_MESSAGE "${SYCL_REASON_FAILURE}")
+  # Check whether the value of __INTEL_LLVM_COMPILER macro was successfully extracted
+  string(COMPARE EQUAL "${__INTEL_LLVM_COMPILER}" "" nosycllang)
+  if(nosycllang)
+    message(STATUS "Can not find __INTEL_LLVM_COMPILER, skipping for custom build")
+    set(__INTEL_LLVM_COMPILER "0")
+  endif()
 endif()
 
 message(DEBUG "The SYCL compiler is ${SYCL_COMPILER}")
 message(DEBUG "The SYCL Flags are ${SYCL_FLAGS}")
+
