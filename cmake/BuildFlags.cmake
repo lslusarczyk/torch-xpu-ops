@@ -111,7 +111,7 @@ macro(set_build_flags)
     elseif(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       set(SYCL_KERNEL_OPTIONS ${SYCL_KERNEL_OPTIONS} -Wno-absolute-value)
       set(SYCL_KERNEL_OPTIONS ${SYCL_KERNEL_OPTIONS} -fno-fast-math)
-      set(SYCL_KERNEL_OPTIONS ${SYCL_KERNEL_OPTIONS} -fma)
+      # set(SYCL_KERNEL_OPTIONS ${SYCL_KERNEL_OPTIONS} -fma)
       # set(SYCL_KERNEL_OPTIONS ${SYCL_KERNEL_OPTIONS} -no-ftz)
     endif()
 
